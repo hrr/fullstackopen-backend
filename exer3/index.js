@@ -3,8 +3,18 @@ const express = require('express')
 const app = express()
 const morgan = require('morgan')
 
-app.use(morgan('tiny'))
 app.use(express.json())
+app.use(
+    morgan(function (tokens, req, res) {
+        return [
+            tokens.method(req, res),
+            tokens.url(req, res),
+            tokens.status(req, res),
+            tokens.res(req, res, 'content-length'), '-',
+            tokens['response-time'](req, res), 'ms',
+            JSON.stringify(req.body)
+        ].join(' ')
+    }))
 
 let persons = [
     {
@@ -45,12 +55,12 @@ app.post('/api/persons', (request, response) => {
         return
     }
 
-    if (persons.map(p => p.name).find(name => name === reqBody.name)){
+    if (persons.map(p => p.name).find(name => name === reqBody.name)) {
         response.status(500).send({ error: 'name must be unique' }).end()
         return
     }
 
-    if (persons.map(p => p.number).find(number => number === reqBody.number)){
+    if (persons.map(p => p.number).find(number => number === reqBody.number)) {
         response.status(500).send({ error: 'number must be unique' }).end()
         return
     }
