@@ -20,8 +20,7 @@ app.use(
     }))
 
 app.get('/info', (request, response) => {
-    //   response.send({ personsLength: persons.length, requestTime: Date.now() })
-    response.send(`Phonebook has info for ${persons.length} people<br/>${new Date()}`)
+    Person.countDocuments({}).then(count => response.send(`Phonebook has info for ${count} people<br/>${new Date()}`))
 })
 
 app.get('/api/persons', (request, response) => {
