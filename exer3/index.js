@@ -37,7 +37,22 @@ app.get('/api/persons', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
     const reqBody = request.body;
-    const newPerson = 
+    if (!reqBody.name || !reqBody.number || reqBody.name === '' || reqBody.number === '') {
+        response.status(500).send('Bad body').end()
+        return
+    }
+
+    if (persons.map(p => p.name).find(name => name === reqBody.name)){
+        response.status(500).send({ error: 'name must be unique' }).end()
+        return
+    }
+
+    if (persons.map(p => p.number).find(number => number === reqBody.number)){
+        response.status(500).send({ error: 'number must be unique' }).end()
+        return
+    }
+
+    const newPerson =
     {
         "id": Math.floor(Math.random() * 100000),
         "name": reqBody.name,
@@ -55,7 +70,7 @@ app.delete('/api/persons/:id', (request, response) => {
         return
     }
     persons = persons.filter(person => person.id !== id)
-  
+
     response.status(204).end()
 })
 
