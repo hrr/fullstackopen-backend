@@ -35,13 +35,25 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = parseInt(request.params.id)
+    const id = Number(request.params.id)
     const person = persons.find(person => person.id === id)
     if (!person) {
         response.status(404).send('Not found')
         return
     }
     response.json(person)
+})
+
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    const person = persons.find(person => person.id === id)
+    if (!person) {
+        response.status(404).send('Not found')
+        return
+    }
+    persons = persons.filter(person => person.id !== id)
+  
+    response.status(204).end()
 })
 
 const PORT = 3002
