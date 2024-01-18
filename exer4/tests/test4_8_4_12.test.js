@@ -57,3 +57,13 @@ test('4_10_add_blog', async () => {
         .expect('Content-Type', /application\/json/)
     expect(getResp.body).toHaveLength(initBlogs.length + 1)
 })
+
+test('4_11_blog_likes', async () => {
+    const resp = await api
+        .get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+    resp.body.forEach(blog => {
+        expect(blog).toHaveProperty('likes')
+    })
+})
