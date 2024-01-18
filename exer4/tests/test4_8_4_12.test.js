@@ -41,3 +41,19 @@ test('4_9_blog_ids', async () => {
 
     expect(resp.body).toBeDefined()
 })
+
+test('4_10_add_blog', async () => {
+    const newBlog = { content: 'Testers Test 3', important: false }
+
+    const postResp = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const getResp = await api
+        .get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+    expect(getResp.body).toHaveLength(initBlogs.length + 1)
+})
