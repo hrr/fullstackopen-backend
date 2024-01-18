@@ -43,7 +43,7 @@ test('4_9_blog_ids', async () => {
 })
 
 test('4_10_add_blog', async () => {
-    const newBlog = { content: 'Testers Test 3', important: false }
+    const newBlog = { content: 'Testers Test 3', important: false, title: 'Title 3', url: 'Url 3' }
 
     const postResp = await api
         .post('/api/blogs')
@@ -66,4 +66,16 @@ test('4_11_blog_likes', async () => {
     resp.body.forEach(blog => {
         expect(blog).toHaveProperty('likes')
     })
+})
+
+test('4_12_blog_properties', async () => {
+    const newBlog = { content: 'Testers Test 4', important: false }
+    expect(newBlog).not.toHaveProperty('title')
+    expect(newBlog).not.toHaveProperty('url')
+
+    const postResp = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
 })

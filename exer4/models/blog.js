@@ -10,6 +10,14 @@ const blogSchema = new mongoose.Schema({
   likes: {
     type: Number,
     default: 0
+  },
+  title: {
+    type: String,
+    required: true
+  },
+  url: {
+    type: String,
+    required: true
   }
 })
 
