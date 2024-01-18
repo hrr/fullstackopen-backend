@@ -13,7 +13,7 @@ beforeEach(async () => {
     console.log('Deleted blogs')
 
     let blogO = new Blog(initBlogs[0])
-    
+
     await blogO.save()
     console.log('Saved blog 1')
 
@@ -24,9 +24,8 @@ beforeEach(async () => {
 
 test('4_8_list_blogs', async () => {
     const resp = await api
-      .get('/api/blogs')
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
-      
+        .get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
     expect(resp.body).toHaveLength(initBlogs.length)
 })
