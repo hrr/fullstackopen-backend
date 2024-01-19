@@ -2,13 +2,13 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
-const { initialBlogs } = require('../utils/test_helper')
+const test_helper = require('../utils/test_helper')
 
 const api = supertest(app)
 let initBlogs = []
 
 beforeEach(async () => {
-    initBlogs = initialBlogs()
+    initBlogs = test_helper.initialBlogs
     await Blog.deleteMany({})
     console.log('Deleted blogs')
 
@@ -78,4 +78,25 @@ test('4_12_blog_properties', async () => {
         .send(newBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/)
+})
+
+describe('4_12 deletion of a blog', () => {
+  test('succeeds with status code 204 if id is valid', async () => {
+    const blogsAtStart = await test_helper.blogsInDB()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await test_helper.blogsInDB()
+
+    expect(blogsAtEnd).toHaveLength(
+        test_helper.initialBlogs.length - 1
+    )
+
+    const contents = blogsAtEnd.map(r => r.content)
+
+    expect(contents).not.toContain(blogToDelete.content)
+  })
 })
