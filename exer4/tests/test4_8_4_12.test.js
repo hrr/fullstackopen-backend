@@ -100,3 +100,22 @@ describe('4_12 deletion of a blog', () => {
     expect(contents).not.toContain(blogToDelete.content)
   })
 })
+
+describe('4_13 update of a blog', () => {
+  test('succeeds with status code 204 if id is valid', async () => {
+    const blogsAtStart = await test_helper.blogsInDB()
+
+    const blogToUpdate = blogsAtStart[0]
+    expect(blogToUpdate.likes).toBe(0)
+    blogToUpdate.likes = 1
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(blogToUpdate)
+      .expect(200)
+
+    const blogsAtEnd = await test_helper.blogsInDB()
+
+    expect(blogsAtEnd.find(b => b.id === blogToUpdate.id).likes).toBe(blogToUpdate.likes)
+  })
+})
