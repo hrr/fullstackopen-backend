@@ -60,10 +60,17 @@ test('4_9_blog_ids', async () => {
 })
 
 test('4_10_add_blog', async () => {
-    const newBlog = { content: 'Testers Test 3', important: false, title: 'Title 3', url: 'Url 3', user: user0.id }
+    const newBlog = { content: 'Testers Test 3', important: false, title: 'Title 3', url: 'Url 3' }
+    const user = { username: user0.username, password: test_helper.initialUsers[0].password }
+    const tokenResp = await api
+        .post('/api/login')
+        .send(user)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
 
     const postResp = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${tokenResp.body.token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -86,53 +93,61 @@ test('4_11_blog_likes', async () => {
 })
 
 test('4_12_blog_properties', async () => {
-    const newBlog = { content: 'Testers Test 4', important: false , important: false, user: user0 }
+    const user = { username: user0.username, password: test_helper.initialUsers[0].password }
+    const tokenResp = await api
+        .post('/api/login')
+        .send(user)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+    const newBlog = { content: 'Testers Test 4', important: false, important: false }
     expect(newBlog).not.toHaveProperty('title')
     expect(newBlog).not.toHaveProperty('url')
 
     const postResp = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${tokenResp.body.token}`)
         .send(newBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/)
 })
 
 describe('4_12 deletion of a blog', () => {
-  test('succeeds with status code 204 if id is valid', async () => {
-    const blogsAtStart = await test_helper.blogsInDB()
-    const blogToDelete = blogsAtStart[0]
+    test('succeeds with status code 204 if id is valid', async () => {
+        const blogsAtStart = await test_helper.blogsInDB()
+        const blogToDelete = blogsAtStart[0]
 
-    await api
-      .delete(`/api/blogs/${blogToDelete.id}`)
-      .expect(204)
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204)
 
-    const blogsAtEnd = await test_helper.blogsInDB()
+        const blogsAtEnd = await test_helper.blogsInDB()
 
-    expect(blogsAtEnd).toHaveLength(
-        test_helper.initialBlogs.length - 1
-    )
+        expect(blogsAtEnd).toHaveLength(
+            test_helper.initialBlogs.length - 1
+        )
 
-    const contents = blogsAtEnd.map(r => r.content)
+        const contents = blogsAtEnd.map(r => r.content)
 
-    expect(contents).not.toContain(blogToDelete.content)
-  })
+        expect(contents).not.toContain(blogToDelete.content)
+    })
 })
 
 describe('4_13 update of a blog', () => {
-  test('succeeds with status code 204 if id is valid', async () => {
-    const blogsAtStart = await test_helper.blogsInDB()
+    test('succeeds with status code 204 if id is valid', async () => {
+        const blogsAtStart = await test_helper.blogsInDB()
 
-    const blogToUpdate = blogsAtStart[0]
-    expect(blogToUpdate.likes).toBe(0)
-    blogToUpdate.likes = 1
+        const blogToUpdate = blogsAtStart[0]
+        expect(blogToUpdate.likes).toBe(0)
+        blogToUpdate.likes = 1
 
-    await api
-      .put(`/api/blogs/${blogToUpdate.id}`)
-      .send(blogToUpdate)
-      .expect(200)
+        await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .send(blogToUpdate)
+            .expect(200)
 
-    const blogsAtEnd = await test_helper.blogsInDB()
+        const blogsAtEnd = await test_helper.blogsInDB()
 
-    expect(blogsAtEnd.find(b => b.id === blogToUpdate.id).likes).toBe(blogToUpdate.likes)
-  })
+        expect(blogsAtEnd.find(b => b.id === blogToUpdate.id).likes).toBe(blogToUpdate.likes)
+    })
 })
