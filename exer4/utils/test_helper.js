@@ -14,6 +14,14 @@ initialBlogs = [
     }
 ]
 
+initialUsers = [
+    {
+        username: "Testusername",
+        name: "Testusername",
+        password: "Testpassword"
+    }
+]
+
 const blogsInDB = async () => {
     const blogs = await Blog.find({})
     return blogs.map(blog => blog.toJSON())
@@ -22,4 +30,5 @@ const blogsInDB = async () => {
 module.exports = {
     initialBlogs,
     blogsInDB,
+    initialUsers,
 }
