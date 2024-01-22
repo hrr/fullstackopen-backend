@@ -8,7 +8,6 @@ usersRouter.post('/', async (request, response) => {
     return response.status(400).json({ error: 'Bad password length'})
 
   const saltRounds = 10
-  console.log(password);
   const passwordHash = await bcrypt.hash(password, saltRounds)
   const user = new User({
     username,
@@ -22,7 +21,7 @@ usersRouter.post('/', async (request, response) => {
 })
 
 usersRouter.get('/', async (request, response) => {
-  const users = await User.find({})
+  const users = await User.find({}).populate('blogs')
   response.json(users)
 })
 

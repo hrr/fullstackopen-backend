@@ -1,25 +1,42 @@
+const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const test_helper = require('../utils/test_helper')
 
 const api = supertest(app)
-let initBlogs = []
-
+let user0
 beforeEach(async () => {
-    initBlogs = test_helper.initialBlogs
+    const initBlogs = test_helper.initialBlogs
+    const initialUsers = test_helper.initialUsers
+
+
+    user0 = new User(initialUsers[0])
+    const passwordHash0 = await bcrypt.hash(initialUsers[0].password, 10)
+    user0.passwordHash = passwordHash0
+
+
+    let user1 = new User(initialUsers[1])
+    const passwordHash1 = await bcrypt.hash(initialUsers[1].password, 10)
+    user1.passwordHash = passwordHash1
+
+    let blog0 = new Blog(initBlogs[0])
+    blog0.user = user0._id
+    let blog1 = new Blog(initBlogs[1])
+    blog1.user = user1._id
+
+    user0.blogs = user0.blogs.concat(blog0._id)
+    user1.blogs = user1.blogs.concat(blog1._id)
+
+    await User.deleteMany({})
+    await user0.save()
+    await user1.save()
+
     await Blog.deleteMany({})
-    console.log('Deleted blogs')
-
-    let blogO = new Blog(initBlogs[0])
-
-    await blogO.save()
-    console.log('Saved blog 1')
-
-    blogO = new Blog(initBlogs[1])
-    await blogO.save()
-    console.log('Saved blog 2')
+    await blog0.save()
+    await blog1.save()
 })
 
 test('4_8_list_blogs', async () => {
@@ -27,7 +44,7 @@ test('4_8_list_blogs', async () => {
         .get('/api/blogs')
         .expect(200)
         .expect('Content-Type', /application\/json/)
-    expect(resp.body).toHaveLength(initBlogs.length)
+    expect(resp.body).toHaveLength(test_helper.initialBlogs.length)
 })
 
 test('4_9_blog_ids', async () => {
@@ -43,7 +60,7 @@ test('4_9_blog_ids', async () => {
 })
 
 test('4_10_add_blog', async () => {
-    const newBlog = { content: 'Testers Test 3', important: false, title: 'Title 3', url: 'Url 3' }
+    const newBlog = { content: 'Testers Test 3', important: false, title: 'Title 3', url: 'Url 3', user: user0.id }
 
     const postResp = await api
         .post('/api/blogs')
@@ -55,7 +72,7 @@ test('4_10_add_blog', async () => {
         .get('/api/blogs')
         .expect(200)
         .expect('Content-Type', /application\/json/)
-    expect(getResp.body).toHaveLength(initBlogs.length + 1)
+    expect(getResp.body).toHaveLength(test_helper.initialBlogs.length + 1)
 })
 
 test('4_11_blog_likes', async () => {
@@ -69,7 +86,7 @@ test('4_11_blog_likes', async () => {
 })
 
 test('4_12_blog_properties', async () => {
-    const newBlog = { content: 'Testers Test 4', important: false , important: false }
+    const newBlog = { content: 'Testers Test 4', important: false , important: false, user: user0 }
     expect(newBlog).not.toHaveProperty('title')
     expect(newBlog).not.toHaveProperty('url')
 
