@@ -116,9 +116,17 @@ describe('4_12 deletion of a blog', () => {
     test('succeeds with status code 204 if id is valid', async () => {
         const blogsAtStart = await test_helper.blogsInDB()
         const blogToDelete = blogsAtStart[0]
+        const user = { username: user0.username, password: test_helper.initialUsers[0].password }
+        
+        const tokenResp = await api
+            .post('/api/login')
+            .send(user)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
 
         await api
             .delete(`/api/blogs/${blogToDelete.id}`)
+            .set('Authorization', `Bearer ${tokenResp.body.token}`)
             .expect(204)
 
         const blogsAtEnd = await test_helper.blogsInDB()

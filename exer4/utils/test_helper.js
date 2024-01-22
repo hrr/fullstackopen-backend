@@ -29,12 +29,12 @@ initialUsers = [
 ]
 
 const blogsInDB = async () => {
-    const blogs = await Blog.find({})
+    const blogs = await Blog.find({}).populate('user')
     return blogs.map(blog => blog.toJSON())
 }
 
 const usersInDB = async () => {
-    const users = await User.find({})
+    const users = await User.find({}).populate('blogs')
     return users.map(user => user.toJSON())
 }
 
