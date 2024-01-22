@@ -4,10 +4,12 @@ const User = require('../models/user')
 
 usersRouter.post('/', async (request, response) => {
   const { username, name, password } = request.body
+  if (password.length < 3)
+    return response.status(400).json({ error: 'Bad password length'})
 
   const saltRounds = 10
+  console.log(password);
   const passwordHash = await bcrypt.hash(password, saltRounds)
-
   const user = new User({
     username,
     name,

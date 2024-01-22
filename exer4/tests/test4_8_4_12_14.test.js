@@ -69,7 +69,7 @@ test('4_11_blog_likes', async () => {
 })
 
 test('4_12_blog_properties', async () => {
-    const newBlog = { content: 'Testers Test 4', important: false }
+    const newBlog = { content: 'Testers Test 4', important: false , important: false }
     expect(newBlog).not.toHaveProperty('title')
     expect(newBlog).not.toHaveProperty('url')
 
