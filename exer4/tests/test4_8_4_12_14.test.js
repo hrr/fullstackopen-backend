@@ -60,7 +60,7 @@ test('4_9_blog_ids', async () => {
 })
 
 test('4_10_add_blog', async () => {
-    const newBlog = { content: 'Testers Test 3', important: false, title: 'Title 3', url: 'Url 3' }
+    const newBlog = { content: 'Testers Test 3', important: false, title: 'Title 3', url: 'Url 3', author: 'Author 3' }
     const user = { username: user0.username, password: test_helper.initialUsers[0].password }
     const tokenResp = await api
         .post('/api/login')

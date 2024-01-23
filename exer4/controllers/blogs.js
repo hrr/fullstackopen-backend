@@ -20,6 +20,7 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response, next) 
     important: body.important || false,
     title: body.title,
     url: body.url,
+    author: body.author,
     user: request.user.id
   })
 
